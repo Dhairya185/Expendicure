@@ -1,60 +1,609 @@
--- Expendicure Seed Data
--- Sample data for testing the application
+-- =============================================================================
+-- EXPENDICURE SEED DATA
+-- =============================================================================
+-- This file is ONLY for local/demo data.
+--
+-- schema.sql  = database structure
+-- seed.sql    = sample data
+--
+-- Do NOT use this file for production user data.
+-- =============================================================================
 
--- Insert sample student
-INSERT INTO students (student_id, name, email) VALUES 
-('STU001', 'John Doe', 'john.doe@university.edu'),
-('STU002', 'Jane Smith', 'jane.smith@university.edu');
+USE expendicure;
 
--- Insert default categories
-INSERT INTO categories (name, is_default) VALUES 
-('Food', TRUE),
-('Rations', TRUE),
-('Travel', TRUE),
-('Books', TRUE),
-('Rent', TRUE),
-('Entertainment', TRUE),
-('Health', TRUE),
-('Other', TRUE);
 
--- Insert sample transactions for John Doe (student_id = 1)
-INSERT INTO transactions (student_id, amount, merchant_name, category_id, payment_date, payment_method, notes) VALUES 
-(1, 15.50, 'Campus Cafe', 1, '2026-04-01', 'Credit Card', 'Lunch with friends'),
-(1, 8.75, 'Bookstore', 4, '2026-04-02', 'Debit Card', 'Notebook for class'),
-(1, 45.00, 'Gas Station', 3, '2026-04-03', 'Cash', 'Fuel for car'),
-(1, 120.00, 'Amazon', 6, '2026-04-05', 'Credit Card', 'New video game'),
-(1, 350.00, 'Apartment Rent', 5, '2026-04-01', 'Bank Transfer', 'Monthly rent'),
-(1, 22.30, 'Grocery Store', 2, '2026-04-04', 'Debit Card', 'Weekly groceries'),
-(1, 75.00, 'Doctor Visit', 7, '2026-04-06', 'Credit Card', 'Checkup'),
-(1, 12.99, 'Netflix', 6, '2026-04-07', 'Credit Card', 'Monthly subscription');
+-- =============================================================================
+-- 1. SAMPLE STUDENTS
+-- =============================================================================
 
--- Insert sample transactions for Jane Smith (student_id = 2)
-INSERT INTO transactions (student_id, amount, merchant_name, category_id, payment_date, payment_method, notes) VALUES 
-(2, 9.50, 'Coffee Shop', 1, '2026-04-01', 'Cash', 'Morning coffee'),
-(2, 25.00, 'Textbook Store', 4, '2026-04-02', 'Credit Card', 'Biology textbook'),
-(2, 30.00, 'Bus Fare', 3, '2026-04-03', 'Cash', 'Weekly bus pass'),
-(2, 18.75, 'Restaurant', 1, '2026-04-04', 'Debit Card', 'Dinner with roommate'),
-(2, 400.00, 'Dormitory', 5, '2026-04-01', 'Bank Transfer', 'Monthly housing'),
-(2, 15.20, 'Pharmacy', 7, '2026-04-05', 'Credit Card', 'Medication');
+INSERT INTO students
+    (student_id, name, email)
+VALUES
+    ('STU001', 'John Doe', 'john.doe@university.edu'),
+    ('STU002', 'Jane Smith', 'jane.smith@university.edu')
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    email = VALUES(email);
 
--- Insert sample budgets for John Doe (student_id = 1) for April 2026
-INSERT INTO budgets (student_id, category_id, monthly_limit, month) VALUES 
-(1, 1, 200.00, '2026-04'), -- Food
-(1, 2, 150.00, '2026-04'), -- Rations
-(1, 3, 100.00, '2026-04'), -- Travel
-(1, 4, 50.00, '2026-04'),  -- Books
-(1, 5, 400.00, '2026-04'), -- Rent
-(1, 6, 100.00, '2026-04'), -- Entertainment
-(1, 7, 75.00, '2026-04'),  -- Health
-(1, 8, 50.00, '2026-04');  -- Other
 
--- Insert sample budgets for Jane Smith (student_id = 2) for April 2026
-INSERT INTO budgets (student_id, category_id, monthly_limit, month) VALUES 
-(2, 1, 150.00, '2026-04'), -- Food
-(2, 2, 100.00, '2026-04'), -- Rations
-(2, 3, 80.00, '2026-04'),  -- Travel
-(2, 4, 75.00, '2026-04'),  -- Books
-(2, 5, 420.00, '2026-04'), -- Rent
-(2, 6, 75.00, '2026-04'),  -- Entertainment
-(2, 7, 50.00, '2026-04'),  -- Health
-(2, 8, 30.00, '2026-04');  -- Other
+-- =============================================================================
+-- 2. SAMPLE TRANSACTIONS — JOHN DOE
+-- =============================================================================
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    15.50,
+    'Campus Cafe',
+    c.id,
+    '2026-04-01',
+    'Credit Card',
+    'Lunch with friends'
+FROM students s
+JOIN categories c ON c.name = 'Food'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Campus Cafe'
+        AND t.amount = 15.50
+        AND t.payment_date = '2026-04-01'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    8.75,
+    'Bookstore',
+    c.id,
+    '2026-04-02',
+    'Debit Card',
+    'Notebook for class'
+FROM students s
+JOIN categories c ON c.name = 'Books'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Bookstore'
+        AND t.amount = 8.75
+        AND t.payment_date = '2026-04-02'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    45.00,
+    'Gas Station',
+    c.id,
+    '2026-04-03',
+    'Cash',
+    'Fuel for car'
+FROM students s
+JOIN categories c ON c.name = 'Travel'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Gas Station'
+        AND t.amount = 45.00
+        AND t.payment_date = '2026-04-03'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    120.00,
+    'Amazon',
+    c.id,
+    '2026-04-05',
+    'Credit Card',
+    'New video game'
+FROM students s
+JOIN categories c ON c.name = 'Entertainment'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Amazon'
+        AND t.amount = 120.00
+        AND t.payment_date = '2026-04-05'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    350.00,
+    'Apartment Rent',
+    c.id,
+    '2026-04-01',
+    'Bank Transfer',
+    'Monthly rent'
+FROM students s
+JOIN categories c ON c.name = 'Rent'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Apartment Rent'
+        AND t.amount = 350.00
+        AND t.payment_date = '2026-04-01'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    22.30,
+    'Grocery Store',
+    c.id,
+    '2026-04-04',
+    'Debit Card',
+    'Weekly groceries'
+FROM students s
+JOIN categories c ON c.name = 'Rations'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Grocery Store'
+        AND t.amount = 22.30
+        AND t.payment_date = '2026-04-04'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    75.00,
+    'Doctor Visit',
+    c.id,
+    '2026-04-06',
+    'Credit Card',
+    'Checkup'
+FROM students s
+JOIN categories c ON c.name = 'Health'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Doctor Visit'
+        AND t.amount = 75.00
+        AND t.payment_date = '2026-04-06'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    12.99,
+    'Netflix',
+    c.id,
+    '2026-04-07',
+    'Credit Card',
+    'Monthly subscription'
+FROM students s
+JOIN categories c ON c.name = 'Entertainment'
+WHERE s.student_id = 'STU001'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Netflix'
+        AND t.amount = 12.99
+        AND t.payment_date = '2026-04-07'
+  );
+
+
+-- =============================================================================
+-- 3. SAMPLE TRANSACTIONS — JANE SMITH
+-- =============================================================================
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    9.50,
+    'Coffee Shop',
+    c.id,
+    '2026-04-01',
+    'Cash',
+    'Morning coffee'
+FROM students s
+JOIN categories c ON c.name = 'Food'
+WHERE s.student_id = 'STU002'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Coffee Shop'
+        AND t.amount = 9.50
+        AND t.payment_date = '2026-04-01'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    25.00,
+    'Textbook Store',
+    c.id,
+    '2026-04-02',
+    'Credit Card',
+    'Biology textbook'
+FROM students s
+JOIN categories c ON c.name = 'Books'
+WHERE s.student_id = 'STU002'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Textbook Store'
+        AND t.amount = 25.00
+        AND t.payment_date = '2026-04-02'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    30.00,
+    'Bus Fare',
+    c.id,
+    '2026-04-03',
+    'Cash',
+    'Weekly bus pass'
+FROM students s
+JOIN categories c ON c.name = 'Travel'
+WHERE s.student_id = 'STU002'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Bus Fare'
+        AND t.amount = 30.00
+        AND t.payment_date = '2026-04-03'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    18.75,
+    'Restaurant',
+    c.id,
+    '2026-04-04',
+    'Debit Card',
+    'Dinner with roommate'
+FROM students s
+JOIN categories c ON c.name = 'Food'
+WHERE s.student_id = 'STU002'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Restaurant'
+        AND t.amount = 18.75
+        AND t.payment_date = '2026-04-04'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    400.00,
+    'Dormitory',
+    c.id,
+    '2026-04-01',
+    'Bank Transfer',
+    'Monthly housing'
+FROM students s
+JOIN categories c ON c.name = 'Rent'
+WHERE s.student_id = 'STU002'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Dormitory'
+        AND t.amount = 400.00
+        AND t.payment_date = '2026-04-01'
+  );
+
+
+INSERT INTO transactions
+    (
+        student_id,
+        amount,
+        merchant_name,
+        category_id,
+        payment_date,
+        payment_method,
+        notes
+    )
+SELECT
+    s.id,
+    15.20,
+    'Pharmacy',
+    c.id,
+    '2026-04-05',
+    'Credit Card',
+    'Health purchase'
+FROM students s
+JOIN categories c ON c.name = 'Health'
+WHERE s.student_id = 'STU002'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transactions t
+      WHERE t.student_id = s.id
+        AND t.merchant_name = 'Pharmacy'
+        AND t.amount = 15.20
+        AND t.payment_date = '2026-04-05'
+  );
+
+
+-- =============================================================================
+-- 4. SAMPLE BUDGETS — JOHN DOE
+-- =============================================================================
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 200.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Food'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 150.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Rations'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 100.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Travel'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 50.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Books'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 400.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Rent'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 100.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Entertainment'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 75.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Health'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 50.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Other'
+WHERE s.student_id = 'STU001'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+-- =============================================================================
+-- 5. SAMPLE BUDGETS — JANE SMITH
+-- =============================================================================
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 150.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Food'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 100.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Rations'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 80.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Travel'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 75.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Books'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 420.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Rent'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 75.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Entertainment'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 50.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Health'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+INSERT INTO budgets (student_id, category_id, monthly_limit, month)
+SELECT s.id, c.id, 30.00, '2026-04'
+FROM students s
+JOIN categories c ON c.name = 'Other'
+WHERE s.student_id = 'STU002'
+ON DUPLICATE KEY UPDATE monthly_limit = VALUES(monthly_limit);
+
+
+-- =============================================================================
+-- END OF SEED DATA
+-- =============================================================================

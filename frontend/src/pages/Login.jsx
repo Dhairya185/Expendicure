@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { Landmark, User, Lock, EyeOff, ArrowRight } from 'lucide-react';
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -32,45 +30,73 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container" style={{ maxWidth: '400px', margin: '4rem auto' }}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Login to Expendicure</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {error && <div className="alert alert-error">{error}</div>}
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Username</label>
-              <Input
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+          <div className="auth-logo">
+            <div className="auth-icon">
+              <Landmark size={20} />
+            </div>
+            Expendicure
+          </div>
+          <h2>Welcome back</h2>
+          <p>Enter your details to access your account.</p>
+        </div>
+        
+        {error && <div className="alert alert-error">{error}</div>}
+        
+        <form onSubmit={handleSubmit} style={{ padding: 0, border: 'none', boxShadow: 'none', background: 'transparent' }}>
+          <div className="form-group">
+            <label>Username or Email</label>
+            <div className="input-icon-wrapper">
+              <User className="icon-left" />
+              <input
                 type="text"
+                className="input"
                 name="username"
+                placeholder="student@university.edu"
                 value={formData.username}
                 onChange={handleChange}
                 required
               />
             </div>
-            <div className="form-group">
-              <label>Password</label>
-              <Input
+          </div>
+          
+          <div className="form-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <label style={{ marginBottom: 0 }}>Password</label>
+              <a href="#" className="link-primary" style={{ fontSize: '0.85rem' }}>Forgot password?</a>
+            </div>
+            <div className="input-icon-wrapper">
+              <Lock className="icon-left" />
+              <input
                 type="password"
+                className="input"
                 name="password"
+                placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
                 required
               />
+              <EyeOff className="icon-right" />
             </div>
-            <div className="form-actions" style={{ flexDirection: 'column' }}>
-              <Button type="submit" loading={loading} style={{ width: '100%' }}>
-                Login
-              </Button>
-              <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-                Don't have an account? <Link to="/register" style={{ color: '#0088FE' }}>Register</Link>
-              </p>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+          
+          <div className="auth-options">
+            <label className="checkbox-label">
+              <input type="checkbox" /> Keep me securely logged in
+            </label>
+          </div>
+          
+          <button type="submit" className={`btn btn-primary ${loading ? 'loading' : ''}`} style={{ width: '100%', padding: '0.85rem' }} disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'} <ArrowRight size={18} />
+          </button>
+        </form>
+        
+        <div className="auth-footer">
+          Don't have an account? <Link to="/register" className="link-primary">Register now</Link>
+        </div>
+      </div>
     </div>
   );
 };

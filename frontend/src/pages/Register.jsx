@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { Landmark, User, Mail, Hash, Lock, ArrowRight } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -50,85 +48,132 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-container" style={{ maxWidth: '500px', margin: '2rem auto' }}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Register for Expendicure</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {error && <div className="alert alert-error">{error}</div>}
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Full Name</label>
-              <Input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
+    <div className="auth-page">
+      <div className="auth-card" style={{ maxWidth: '500px', padding: '2rem 2.5rem' }}>
+        <div className="auth-header" style={{ marginBottom: '1.5rem' }}>
+          <div className="auth-logo">
+            <div className="auth-icon">
+              <Landmark size={20} />
             </div>
-            <div className="form-group">
-              <label>Email</label>
-              <Input
+            Expendicure
+          </div>
+          <h2>Create Account</h2>
+          <p>Join to manage your student finances.</p>
+        </div>
+        
+        {error && <div className="alert alert-error">{error}</div>}
+        
+        <form onSubmit={handleSubmit} style={{ padding: 0, border: 'none', boxShadow: 'none', background: 'transparent' }}>
+          
+          <div className="grid-2">
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label>Full Name</label>
+              <div className="input-icon-wrapper">
+                <User className="icon-left" />
+                <input
+                  type="text"
+                  className="input"
+                  name="name"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label>Username</label>
+              <div className="input-icon-wrapper">
+                <User className="icon-left" />
+                <input
+                  type="text"
+                  className="input"
+                  name="username"
+                  placeholder="johndoe"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <label>Email</label>
+            <div className="input-icon-wrapper">
+              <Mail className="icon-left" />
+              <input
                 type="email"
+                className="input"
                 name="email"
+                placeholder="student@university.edu"
                 value={formData.email}
                 onChange={handleChange}
                 required
               />
             </div>
-            <div className="form-group">
-              <label>Student ID (e.g. STU003)</label>
-              <Input
+          </div>
+          
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <label>Student ID</label>
+            <div className="input-icon-wrapper">
+              <Hash className="icon-left" />
+              <input
                 type="text"
+                className="input"
                 name="student_id_str"
+                placeholder="STU001"
                 value={formData.student_id_str}
                 onChange={handleChange}
                 required
               />
             </div>
-            <div className="form-group">
-              <label>Username</label>
-              <Input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
+          </div>
+          
+          <div className="grid-2">
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>Password</label>
-              <Input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+              <div className="input-icon-wrapper">
+                <Lock className="icon-left" />
+                <input
+                  type="password"
+                  className="input"
+                  name="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
-            <div className="form-group">
+
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>Confirm Password</label>
-              <Input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
+              <div className="input-icon-wrapper">
+                <Lock className="icon-left" />
+                <input
+                  type="password"
+                  className="input"
+                  name="confirmPassword"
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
-            <div className="form-actions" style={{ flexDirection: 'column' }}>
-              <Button type="submit" loading={loading} style={{ width: '100%' }}>
-                Register
-              </Button>
-              <p style={{ textAlign: 'center', margin: '1rem 0' }}>
-                Already have an account? <Link to="/login" style={{ color: '#0088FE' }}>Login</Link>
-              </p>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+          
+          <button type="submit" className={`btn btn-primary ${loading ? 'loading' : ''}`} style={{ width: '100%', padding: '0.85rem', marginTop: '1rem' }} disabled={loading}>
+            {loading ? 'Creating Account...' : 'Register'} <ArrowRight size={18} />
+          </button>
+        </form>
+        
+        <div className="auth-footer" style={{ marginTop: '1rem', paddingTop: '1rem' }}>
+          Already have an account? <Link to="/login" className="link-primary">Login here</Link>
+        </div>
+      </div>
     </div>
   );
 };

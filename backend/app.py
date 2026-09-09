@@ -13,6 +13,8 @@ from routes.categories import categories_bp
 from routes.budgets import budgets_bp
 from routes.dashboard import dashboard_bp
 from routes.reports import reports_bp
+from routes.sms_transactions import sms_transactions_bp
+from routes.financial_agent import financial_agent_bp
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -22,6 +24,8 @@ app.register_blueprint(categories_bp, url_prefix='/api/categories')
 app.register_blueprint(budgets_bp, url_prefix='/api/budgets')
 app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(reports_bp, url_prefix='/api/reports')
+app.register_blueprint(sms_transactions_bp, url_prefix='/api/sms-transactions')
+app.register_blueprint(financial_agent_bp, url_prefix='/api/financial-agent')
 
 @app.route('/')
 def home():
