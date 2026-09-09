@@ -37,5 +37,8 @@ class Config:
     DB_SSL_CA = os.environ.get('DB_SSL_CA')
     DB_SSL_DISABLED = os.environ.get('DB_SSL_DISABLED', 'false').lower() in ['true', '1', 'yes']
 
+    # Database Connection Pool
+    DB_POOL_SIZE = int(os.environ.get('DB_POOL_SIZE', '10'))
+
     # Flask Configuration
     DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() in ['true', '1', 'yes']

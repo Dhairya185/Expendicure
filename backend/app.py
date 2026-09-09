@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from config import Config
-from database import get_db_connection
+from database import get_db_connection, close_request_connection
 app = Flask(__name__)
+
+# Return the per-request shared DB connection to the pool at end of each request
+app.teardown_appcontext(close_request_connection)
 CORS(app)  # Enable CORS for all routes
 
 # Import routes
